@@ -32,6 +32,7 @@ class AtlasPh {
     void getPotentialHydrogen(void);
     
     // Private Variables
+    boolean _sensor_failure = false;
     String _potential_hydrogen_id;
     int _potential_hydrogen_channel;
 };
