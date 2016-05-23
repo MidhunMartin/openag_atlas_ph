@@ -1,43 +1,44 @@
-/** 
+/**
  *  \file openag_atlas_ph.h
  *  \brief Potential hydrogen sensor.
  */
 #ifndef OPENAG_ATLAS_PH_H
 #define OPENAG_ATLAS_PH_H
 
-#if ARDUINO >= 100
- #include "Arduino.h"
-#else
- #include "WProgram.h"
-#endif
-
+#include "Arduino.h"
 #include <Wire.h>
+#include <openag_peripheral.h>
+
+#define POTENTIAL_HYDROGEN_KEY "potential_hydrogen"
+#define MIN_UPDATE_INTERVAL 0 // milliseconds
 
 /**
  * \brief Potential hydrogen sensor.
  */
-class AtlasPh {
+class AtlasPh : public Peripheral {
   public:
-    // Public Functions
-    AtlasPh(String potential_hydrogen_id, int potential_hydrogen_channel);
-    void begin(void);
-    String get(String id);
-    String set(String id, String value);
-
-    // Public Variables
+    // Public variables
+    String id;
     float potential_hydrogen;
-    
+
+    // Public functions
+    AtlasPh(String id, String* parameters);
+    ~AtlasPh();
+    void begin(void);
+    String get(String key);
+    String set(String key, String value);
+
   private:
-    // Private Functions
-    void getPotentialHydrogen(void);
-    
-    // Private Variables
-    boolean _sensor_failure = false;
-    String _potential_hydrogen_id;
+    // Private variables
     int _potential_hydrogen_channel;
+    String _potential_hydrogen_message;
+    uint32_t _time_of_last_reading;
+
+    // Private functions
+    void getData();
+    String getPotentialHydrogen();
+    String getMessage(String key, String value);
+    String getErrorMessage(String key);
 };
 
 #endif
-
-
-
