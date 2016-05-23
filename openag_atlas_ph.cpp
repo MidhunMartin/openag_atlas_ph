@@ -7,6 +7,7 @@
 AtlasPh::AtlasPh(String id, String* parameters) : Peripheral(id, parameters){
   this->id = id;
   _potential_hydrogen_channel = parameters[0].toInt();
+  _potential_hydrogen_key = "potential_hydrogen";
 }
 
 AtlasPh::~AtlasPh() {}
@@ -17,19 +18,19 @@ void AtlasPh::begin() {
 }
 
 String AtlasPh::get(String key) {
-  if (key == String(POTENTIAL_HYDROGEN_KEY)) {
+  if (key == String(_potential_hydrogen_key)) {
     return getPotentialHydrogen();
   }
 }
 
 String AtlasPh::set(String key, String value) {
-  if (key == String(POTENTIAL_HYDROGEN_KEY)) {
-    return getErrorMessage(POTENTIAL_HYDROGEN_KEY);
+  if (key == String(_potential_hydrogen_key)) {
+    return getErrorMessage(_potential_hydrogen_key);
   }
 }
 
 String AtlasPh::getPotentialHydrogen(){
-  if (millis() - _time_of_last_reading > MIN_UPDATE_INTERVAL){ // can only read sensor so often
+  if (millis() - _time_of_last_reading > _min_update_interval){ // can only read sensor so often
     getData();
     _time_of_last_reading = millis();
   }
@@ -67,10 +68,10 @@ void AtlasPh::getData() {
 
   // Update messages
   if (is_good_reading) {
-    _potential_hydrogen_message = getMessage(POTENTIAL_HYDROGEN_KEY, String(potential_hydrogen, 1));
+    _potential_hydrogen_message = getMessage(_potential_hydrogen_key, String(potential_hydrogen, 1));
   }
   else { // read failure
-    _potential_hydrogen_message = getErrorMessage(POTENTIAL_HYDROGEN_KEY);
+    _potential_hydrogen_message = getErrorMessage(_potential_hydrogen_key);
   }
 }
 

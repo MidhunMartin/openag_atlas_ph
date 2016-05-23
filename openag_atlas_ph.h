@@ -9,9 +9,6 @@
 #include <Wire.h>
 #include <openag_peripheral.h>
 
-#define POTENTIAL_HYDROGEN_KEY "potential_hydrogen"
-#define MIN_UPDATE_INTERVAL 0 // milliseconds
-
 /**
  * \brief Potential hydrogen sensor.
  */
@@ -33,6 +30,8 @@ class AtlasPh : public Peripheral {
     int _potential_hydrogen_channel;
     String _potential_hydrogen_message;
     uint32_t _time_of_last_reading;
+    const static uint32_t _min_update_interval = 0;
+    String _potential_hydrogen_key;
 
     // Private functions
     void getData();
