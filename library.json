@@ -10,7 +10,7 @@
     "platforms": "*",
     "dependencies": [
         {
-            "name": "openag_peripheral"
+            "name": "rosserial_arduino"
         }
     ]
 }

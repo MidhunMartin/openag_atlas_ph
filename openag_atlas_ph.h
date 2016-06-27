@@ -7,37 +7,36 @@
 
 #include "Arduino.h"
 #include <Wire.h>
-#include <openag_peripheral.h>
+#include <std_msgs/Float32.h>
 
 /**
  * \brief Potential hydrogen sensor.
  */
-class AtlasPh : public Peripheral {
+class AtlasPh {
   public:
+    // Constructor
+    AtlasPh(int i2c_address);
+
     // Public variables
-    String id;
-    float potential_hydrogen;
+    bool has_error;
+    char* error_msg;
 
     // Public functions
-    AtlasPh(String id, String* parameters);
-    ~AtlasPh();
-    void begin(void);
-    String get(String key);
-    String set(String key, String value);
+    void begin();
+    bool get_potential_hydrogen(std_msgs::Float32 &msg);
 
   private:
     // Private variables
-    int _potential_hydrogen_channel;
-    String _potential_hydrogen_message;
+    float _potential_hydrogen;
     uint32_t _time_of_last_reading;
-    const static uint32_t _min_update_interval = 0;
-    String _potential_hydrogen_key;
+    uint32_t _time_of_last_query;
+    bool _waiting_for_response;
+    const static uint32_t _min_update_interval = 2000;
+    int _i2c_address;
 
     // Private functions
-    void getData();
-    String getPotentialHydrogen();
-    String getMessage(String key, String value);
-    String getErrorMessage(String key);
+    void send_query();
+    bool read_response();
 };
 
 #endif

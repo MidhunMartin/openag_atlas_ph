@@ -4,81 +4,67 @@
  */
 #include "openag_atlas_ph.h"
 
-AtlasPh::AtlasPh(String id, String* parameters) : Peripheral(id, parameters){
-  this->id = id;
-  _potential_hydrogen_channel = parameters[0].toInt();
-  _potential_hydrogen_key = "potential_hydrogen";
+AtlasPh::AtlasPh(int i2c_address) {
+    _i2c_address = i2c_address;
 }
-
-AtlasPh::~AtlasPh() {}
 
 void AtlasPh::begin() {
-  Wire.begin(); // enable i2c port
+  Wire.begin();
   _time_of_last_reading = 0;
+  _time_of_last_query = 0;
+  _waiting_for_response = false;
 }
 
-String AtlasPh::get(String key) {
-  if (key == String(_potential_hydrogen_key)) {
-    return getPotentialHydrogen();
+bool AtlasPh::get_potential_hydrogen(std_msgs::Float32 &msg) {
+  if (_waiting_for_response) {
+    if (millis() - _time_of_last_query > 1000) {
+      _waiting_for_response = false;
+      _time_of_last_reading = millis();
+      if (read_response()) {
+        msg.data = _potential_hydrogen;
+        return true;
+      }
+    }
+    return false;
   }
-}
-
-String AtlasPh::set(String key, String value) {
-  if (key == String(_potential_hydrogen_key)) {
-    return getErrorMessage(_potential_hydrogen_key);
+  else if (millis() - _time_of_last_reading > _min_update_interval){
+    send_query();
   }
+  return false;
 }
 
-String AtlasPh::getPotentialHydrogen(){
-  if (millis() - _time_of_last_reading > _min_update_interval){ // can only read sensor so often
-    getData();
-    _time_of_last_reading = millis();
-  }
-  return _potential_hydrogen_message;
-}
-
-void AtlasPh::getData() {
-  boolean is_good_reading = true;
-
-  // Read sensor
-  Wire.beginTransmission(_potential_hydrogen_channel); // read message response state
+void AtlasPh::send_query() {
+  Wire.beginTransmission(_i2c_address);
   Wire.print("R");
   Wire.endTransmission();
-  delay(1000);
-  Wire.requestFrom(_potential_hydrogen_channel, 20, 1);
+  _waiting_for_response = true;
+  _time_of_last_query = millis();
+}
+
+bool AtlasPh::read_response() {
+  Wire.requestFrom(_i2c_address, 20, 1);
   byte response = Wire.read(); // increment buffer by a byte
   String string = Wire.readStringUntil(0);
 
   // Check for failure
   if (response == 255) {
-    is_good_reading = false; // no data
+    error_msg = "No data";
+    has_error = true;
   }
   else if (response == 254) {
-    is_good_reading = false; // request pending
+    error_msg = "Tried to read data before request was processed";
+    has_error = true;
   }
   else if (response == 2) {
-    is_good_reading = false; // request failed
+    error_msg = "Request failed";
+    has_error = true;
   }
   else if (response == 1) { // good reading
-    potential_hydrogen = string.toFloat();
+    _potential_hydrogen = string.toFloat();
   }
   else {
-    is_good_reading = false; // unknown error
+    error_msg = "Unknown error";
+    has_error = true;
   }
-
-  // Update messages
-  if (is_good_reading) {
-    _potential_hydrogen_message = getMessage(_potential_hydrogen_key, String(potential_hydrogen, 1));
-  }
-  else { // read failure
-    _potential_hydrogen_message = getErrorMessage(_potential_hydrogen_key);
-  }
-}
-
-String AtlasPh::getMessage(String key, String value) {
-  return String(id + "," + key + "," + value);
-}
-
-String AtlasPh::getErrorMessage(String key) {
-  return String(id + "," + key + ",error");
+  return !has_error;
 }
