@@ -10,7 +10,7 @@ void setup() {
 std_msgs::Float32 ph_msg;
 
 void loop() {
-  if (atlas_ph_1.get_potential_hydrogen(ph_msg)) {
+  if (atlas_ph_1.get_water_potential_hydrogen(ph_msg)) {
     Serial.print("Potential Hydrogen: ");
     Serial.println(ph_msg.data);
   }

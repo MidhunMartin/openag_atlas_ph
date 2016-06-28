@@ -15,13 +15,13 @@ void AtlasPh::begin() {
   _waiting_for_response = false;
 }
 
-bool AtlasPh::get_potential_hydrogen(std_msgs::Float32 &msg) {
+bool AtlasPh::get_water_potential_hydrogen(std_msgs::Float32 &msg) {
   if (_waiting_for_response) {
     if (millis() - _time_of_last_query > 1000) {
       _waiting_for_response = false;
       _time_of_last_reading = millis();
       if (read_response()) {
-        msg.data = _potential_hydrogen;
+        msg.data = _water_potential_hydrogen;
         return true;
       }
     }
@@ -60,7 +60,7 @@ bool AtlasPh::read_response() {
     has_error = true;
   }
   else if (response == 1) { // good reading
-    _potential_hydrogen = string.toFloat();
+    _water_potential_hydrogen = string.toFloat();
   }
   else {
     error_msg = "Unknown error";
