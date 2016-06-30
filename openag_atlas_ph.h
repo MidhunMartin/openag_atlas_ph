@@ -23,11 +23,13 @@ class AtlasPh {
 
     // Public functions
     void begin();
+    void update();
     bool get_water_potential_hydrogen(std_msgs::Float32 &msg);
 
   private:
     // Private variables
     float _water_potential_hydrogen;
+    bool _send_water_potential_hydrogen;
     uint32_t _time_of_last_reading;
     uint32_t _time_of_last_query;
     bool _waiting_for_response;
@@ -36,7 +38,7 @@ class AtlasPh {
 
     // Private functions
     void send_query();
-    bool read_response();
+    void read_response();
 };
 
 #endif
