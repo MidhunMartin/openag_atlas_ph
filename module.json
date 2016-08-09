@@ -1,0 +1,17 @@
+{
+    "description": "Driver for the Atlas Scientific pH sensor",
+    "class_name": "AtlasPh",
+    "header_file": "openag_atlas_ph.h",
+    "arguments": [
+        {
+            "name": "i2c_address",
+            "type": "int",
+            "default": 99
+        }
+    ],
+    "outputs": {
+        "water_potential_hydrogen": {
+            "type": "std_msgs/Float32"
+        }
+    }
+}

@@ -7,21 +7,15 @@
 
 #include "Arduino.h"
 #include <Wire.h>
+#include <openag_module.h>
 #include <std_msgs/Float32.h>
 
 /**
  * \brief Potential hydrogen sensor.
  */
-class AtlasPh {
+class AtlasPh : public Module {
   public:
-    // Constructor
     AtlasPh(int i2c_address);
-
-    // Public variables
-    bool has_error;
-    char* error_msg;
-
-    // Public functions
     void begin();
     void update();
     bool get_water_potential_hydrogen(std_msgs::Float32 &msg);

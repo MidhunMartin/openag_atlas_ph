@@ -5,7 +5,8 @@
 #include "openag_atlas_ph.h"
 
 AtlasPh::AtlasPh(int i2c_address) {
-  has_error = false;
+  status_level = OK;
+  status_msg = "";
   _send_water_potential_hydrogen = false;
   _time_of_last_reading = 0;
   _time_of_last_query = 0;
@@ -49,27 +50,28 @@ void AtlasPh::read_response() {
   Wire.requestFrom(_i2c_address, 20, 1);
   byte response = Wire.read(); // increment buffer by a byte
   String string = Wire.readStringUntil(0);
-  has_error = false;
+  status_level = OK;
+  status_msg = "";
 
   // Check for failure
   if (response == 255) {
-    error_msg = "No data";
-    has_error = true;
+    status_msg = "No data";
+    status_level = ERROR;
   }
   else if (response == 254) {
-    error_msg = "Tried to read data before request was processed";
-    has_error = true;
+    status_msg = "Tried to read data before request was processed";
+    status_level = ERROR;
   }
   else if (response == 2) {
-    error_msg = "Request failed";
-    has_error = true;
+    status_msg = "Request failed";
+    status_level = ERROR;
   }
   else if (response == 1) { // good reading
     _water_potential_hydrogen = string.toFloat();
     _send_water_potential_hydrogen = true;
   }
   else {
-    error_msg = "Unknown error";
-    has_error = true;
+    status_msg = "Unknown error";
+    status_level = ERROR;
   }
 }

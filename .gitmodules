@@ -1,3 +1,0 @@
-[submodule "lib/openag_peripheral"]
-	path = lib/openag_peripheral
-	url = https://github.com/OpenAgInitiative/openag_peripheral.git
