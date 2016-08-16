@@ -9,6 +9,20 @@
             "default": 99
         }
     ],
+    "inputs": {
+        "midpoint_calibration": {
+            "type": "std_msgs/Float32",
+            "categories": ["calibration"]
+        },
+        "lowpoint_calibration": {
+            "type": "std_msgs/Float32",
+            "categories": ["calibration"]
+        },
+        "highpoint_calibration": {
+            "type": "std_msgs/Float32",
+            "categories": ["calibration"]
+        }
+    },
     "outputs": {
         "water_potential_hydrogen": {
             "type": "std_msgs/Float32"

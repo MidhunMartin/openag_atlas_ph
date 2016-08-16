@@ -38,6 +38,30 @@ bool AtlasPh::get_water_potential_hydrogen(std_msgs::Float32 &msg) {
   return res;
 }
 
+void AtlasPh::set_midpoint_calibration(std_msgs::Float32 msg) {
+  Wire.beginTransmission(_i2c_address);
+  char buf[14];
+  sprintf(buf, "Cal,mid,%.2f", msg.data);
+  Wire.print(buf);
+  Wire.endTransmission();
+}
+
+void AtlasPh::set_lowpoint_calibration(std_msgs::Float32 msg) {
+  Wire.beginTransmission(_i2c_address);
+  char buf[14];
+  sprintf(buf, "Cal,low,%.2f", msg.data);
+  Wire.print(buf);
+  Wire.endTransmission();
+}
+
+void AtlasPh::set_highpoint_calibration(std_msgs::Float32 msg) {
+  Wire.beginTransmission(_i2c_address);
+  char buf[15];
+  sprintf(buf, "Cal,high,%.2f", msg.data);
+  Wire.print(buf);
+  Wire.endTransmission();
+}
+
 void AtlasPh::send_query() {
   Wire.beginTransmission(_i2c_address);
   Wire.print("R");

@@ -19,6 +19,9 @@ class AtlasPh : public Module {
     void begin();
     void update();
     bool get_water_potential_hydrogen(std_msgs::Float32 &msg);
+    void set_midpoint_calibration(std_msgs::Float32 msg);
+    void set_lowpoint_calibration(std_msgs::Float32 msg);
+    void set_highpoint_calibration(std_msgs::Float32 msg);
 
   private:
     // Private variables
