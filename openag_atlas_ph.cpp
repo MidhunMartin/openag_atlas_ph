@@ -8,7 +8,6 @@ AtlasPh::AtlasPh(int i2c_address) {
   status_level = OK;
   status_msg = "";
   _send_water_potential_hydrogen = false;
-  _time_of_last_reading = 0;
   _time_of_last_query = 0;
   _waiting_for_response = false;
   _i2c_address = i2c_address;
@@ -20,13 +19,9 @@ void AtlasPh::begin() {
 
 void AtlasPh::update() {
   if (_waiting_for_response) {
-    if (millis() - _time_of_last_query > 1000) {
-      _waiting_for_response = false;
-      _time_of_last_reading = millis();
-      read_response();
-    }
+    read_response();
   }
-  else if (millis() - _time_of_last_reading > _min_update_interval) {
+  else if (millis() - _time_of_last_query > _min_update_interval) {
     send_query();
   }
 }
@@ -74,25 +69,27 @@ void AtlasPh::read_response() {
   Wire.requestFrom(_i2c_address, 20, 1);
   byte response = Wire.read(); // increment buffer by a byte
   String string = Wire.readStringUntil(0);
-  status_level = OK;
-  status_msg = "";
 
   // Check for failure
   if (response == 255) {
-    status_msg = "No data";
     status_level = ERROR;
+    status_msg = "No response";
+    _waiting_for_response = false;
   }
   else if (response == 254) {
-    status_msg = "Tried to read data before request was processed";
-    status_level = ERROR;
+    // Request hasn't been processed yet
   }
   else if (response == 2) {
-    status_msg = "Request failed";
     status_level = ERROR;
+    status_msg = "Request failed";
+    _waiting_for_response = false;
   }
-  else if (response == 1) { // good reading
+  else if (response == 1) {
+    status_level = OK;
+    status_msg = "";
     _water_potential_hydrogen = string.toFloat();
     _send_water_potential_hydrogen = true;
+    _waiting_for_response = false;
   }
   else {
     status_msg = "Unknown error";

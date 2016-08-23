@@ -27,7 +27,6 @@ class AtlasPh : public Module {
     // Private variables
     float _water_potential_hydrogen;
     bool _send_water_potential_hydrogen;
-    uint32_t _time_of_last_reading;
     uint32_t _time_of_last_query;
     bool _waiting_for_response;
     const static uint32_t _min_update_interval = 2000;
