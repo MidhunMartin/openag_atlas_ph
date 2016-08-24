@@ -19,7 +19,9 @@ void AtlasPh::begin() {
 
 void AtlasPh::update() {
   if (_waiting_for_response) {
-    read_response();
+    if (millis() - _time_of_last_query > 1800) {
+      read_response();
+    }
   }
   else if (millis() - _time_of_last_query > _min_update_interval) {
     send_query();
@@ -58,11 +60,11 @@ void AtlasPh::set_highpoint_calibration(std_msgs::Float32 msg) {
 }
 
 void AtlasPh::send_query() {
+  _time_of_last_query = millis();
   Wire.beginTransmission(_i2c_address);
   Wire.print("R");
   Wire.endTransmission();
   _waiting_for_response = true;
-  _time_of_last_query = millis();
 }
 
 void AtlasPh::read_response() {
